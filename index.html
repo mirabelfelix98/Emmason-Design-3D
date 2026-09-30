@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emmason Designs — Creative Technology Agency</title>
+<meta name="description" content="Emmason Designs builds websites, funnels, ad systems and AI agents that turn attention into revenue.">
+<meta property="og:title" content="Emmason Designs — Creative Technology Agency">
+<meta property="og:description" content="Websites, funnels, ad systems and AI agents built to capture the money your business is leaving on the table.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%232d4fc6'/><text x='50' y='68' font-family='Arial Black' font-size='60' fill='white' text-anchor='middle'>E</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
+<style>
+:root{
+  --bg:#000000;
+  --fg:#ffffff;
+  --fg-muted:#8a8a8a;
+  --blue:#2d4fc6;
+  --purple:#4518c5;
+  --lime:#afff00;
+  --orange:#e45631;
+  --gold:#cc922d;
+  --pink:#c88d58;
+  --border:rgba(255,255,255,0.08);
+  --border-faint:rgba(255,255,255,0.04);
+  --container:1440px;
+  --pad:clamp(1.5rem,5vw,4rem);
+  --section-pad:clamp(6rem,12vw,12rem);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{background:var(--bg);scroll-behavior:auto;}
+html.lenis{height:auto;}
+.lenis.lenis-smooth{scroll-behavior:auto;}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--lime);color:#000;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:#0a0a0a;}
+::-webkit-scrollbar-thumb{background:#333;border-radius:2px;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;}
+
+.wrap{max-width:var(--container);margin:0 auto;padding:0 var(--pad);}
+
+h1,h2,h3,.display{
+  font-family:'Anton',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:-0.035em;
+  line-height:0.92;
+  font-weight:400;
+}
+p{color:var(--fg-muted);line-height:1.6;max-width:65ch;}
+
+.eyebrow{
+  font-size:0.68rem;
+  text-transform:uppercase;
+  letter-spacing:0.14em;
+  color:var(--fg-muted);
+  display:flex;
+  align-items:center;
+  gap:0.6rem;
+  margin-bottom:1.2rem;
+}
+.eyebrow::before{content:'';width:22px;height:1px;background:var(--blue);display:inline-block;}
+
+/* ===== Preloader ===== */
+#preloader{
+  position:fixed;inset:0;background:#000;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.6s var(--ease), visibility 0.6s var(--ease);
+}
+#preloader .ring{
+  width:44px;height:44px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.08);
+  border-top-color:var(--blue);
+  animation:spin 0.9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+#preloader.hidden{opacity:0;visibility:hidden;}
+
+/* ===== Ambient grain layer ===== */
+#grain{
+  position:fixed;inset:0;pointer-events:none;z-index:40;
+  opacity:0.035;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.4s steps(4) infinite;
+}
+@keyframes grain{0%{transform:translate(0,0);}50%{transform:translate(-2%,1%);}100%{transform:translate(1%,-1%);}}
+
+/* ===== Navbar ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:72px;display:flex;align-items:center;
+  background:rgba(0,0,0,0.35);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid transparent;
+  transition:background 0.4s var(--ease), border-color 0.4s var(--ease);
+}
+nav.scrolled{background:rgba(0,0,0,0.75);border-bottom-color:var(--border-faint);}
+.nav-inner{width:100%;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:0.6rem;font-family:'Anton',sans-serif;font-size:1.05rem;letter-spacing:0.01em;}
+.logo-mark{width:30px;height:30px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.nav-links{display:flex;gap:2.2rem;list-style:none;}
+.nav-links a{
+  font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;
+  position:relative;padding-bottom:4px;color:#ddd;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--lime);
+  transition:width 0.3s var(--ease);
+}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;
+  padding:0.7rem 1.4rem;border-radius:2px;
+  background:var(--lime);color:#000;font-weight:700;
+  transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(175,255,0,0.25);}
+.burger{
+  display:none;
+  width:36px;
+  height:36px;
+  position:relative;
+  background:none;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  z-index:102;
+  align-items:center;
+  justify-content:center;
+}
+.burger span{
+  width:22px;
+  height:2px;
+  background:#fff;
+  display:block;
+  position:absolute;
+  left:7px;
+  border-radius:1px;
+  transition:transform 0.3s var(--ease), opacity 0.25s var(--ease), background-color 0.25s var(--ease), top 0.3s var(--ease);
+}
+.burger span:nth-child(1){ top:11px; }
+.burger span:nth-child(2){ top:17px; }
+.burger span:nth-child(3){ top:23px; }
+
+/* Morph hamburger into visible X when menu is open in exact same header location */
+.burger.open span:nth-child(1){
+  top:17px;
+  transform:rotate(45deg);
+  background:var(--lime);
+}
+.burger.open span:nth-child(2){
+  opacity:0;
+  transform:scaleX(0);
+}
+.burger.open span:nth-child(3){
+  top:17px;
+  transform:rotate(-45deg);
+  background:var(--lime);
+}
+
+.mobile-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  z-index:98;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity 0.35s var(--ease), visibility 0.35s var(--ease);
+}
+.mobile-backdrop.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+.mobile-overlay{
+  position:fixed;
+  top:72px;
+  right:0;
+  z-index:99;
+  width:min(82vw, 290px);
+  height:auto;
+  max-height:fit-content;
+  background:rgba(10,11,16,0.97);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-left:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  border-bottom-left-radius:10px;
+  box-shadow:-12px 18px 45px rgba(0,0,0,0.7), 0 0 30px rgba(45,79,198,0.12);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  padding:0.4rem 1.6rem 1.1rem;
+  transform:translateY(-14px);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:transform 0.32s var(--ease), opacity 0.32s var(--ease), visibility 0.32s var(--ease);
+}
+.mobile-overlay.open{
+  transform:translateY(0);
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.mobile-overlay a{
+  font-family:'Anton',sans-serif;
+  font-size:1.55rem;
+  letter-spacing:0.01em;
+  text-transform:uppercase;
+  padding:0.75rem 0;
+  color:#f2f2f2;
+  border-bottom:1px solid var(--border-faint);
+  display:block;
+  transition:color 0.2s var(--ease), padding-left 0.2s var(--ease);
+}
+.mobile-overlay a:last-of-type{
+  border-bottom:none;
+}
+.mobile-overlay a:hover,
+.mobile-overlay a:active{
+  color:var(--lime);
+  padding-left:4px;
+}
+
+/* ===== Hero ===== */
+.hero{
+  position:relative;min-height:100vh;display:flex;align-items:center;
+  padding-top:9.5rem;padding-bottom:4rem;overflow:hidden;
+}
+#hero-canvas{position:absolute;inset:0;z-index:0;}
+.hero-grid{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:64px 64px;
+  -webkit-mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+  mask-image:radial-gradient(ellipse at center, black 0%, transparent 72%);
+}
+.hero-glow{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 25%, rgba(45,79,198,0.20), transparent 45%),
+    radial-gradient(circle at 82% 70%, rgba(69,24,197,0.18), transparent 45%);
+}
+.hero-inner{position:relative;z-index:2;width:100%;}
+.hero .wrap{display:grid;grid-template-columns:1.15fr 0.85fr;gap:2rem;align-items:center;}
+.badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  padding:0.5rem 1rem;border:1px solid var(--border);border-radius:100px;
+  font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--lime);
+  margin-bottom:1.6rem;
+}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--lime);}
+.hero h1{
+  font-size:clamp(2.6rem,6vw,5.2rem);
+  margin-bottom:1.6rem;
+}
+.hero h1 .accent{
+  color: var(--lime);
+  background: linear-gradient(90deg, #afff00, #00ff88);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero p.lead{font-size:1.05rem;max-width:480px;margin-bottom:2.2rem;color:#c9c9c9;}
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3.5rem;}
+.btn{
+  padding:0.95rem 1.9rem;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;
+  font-weight:700;border-radius:2px;display:inline-flex;align-items:center;gap:0.5rem;
+  transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+}
+.btn-primary{background:var(--lime);color:#000;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(175,255,0,0.28);}
+.btn-ghost{border:1px solid var(--border);color:#fff;}
+.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,0.04);}
+.stats-row{display:flex;gap:0;border-top:1px solid var(--border-faint);padding-top:1.8rem;max-width:520px;}
+.stat{flex:1;padding-right:1.5rem;border-right:1px solid var(--border-faint);}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:'Anton',sans-serif;font-size:clamp(1.6rem,3vw,2.4rem);color:var(--blue);}
+.stat-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--fg-muted);margin-top:0.3rem;}
+
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;height:380px;}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.12);}
+.ring1{width:100%;height:100%;animation:spin-slow 18s linear infinite;border-color:rgba(45,79,198,0.35);}
+.ring2{width:72%;height:72%;animation:spin-slow-rev 14s linear infinite;border-color:rgba(69,24,197,0.3);}
+.ring3{width:46%;height:46%;animation:spin-slow 10s linear infinite;border-color:rgba(175,255,0,0.25);}
+@keyframes spin-slow{to{transform:rotate(360deg);}}
+@keyframes spin-slow-rev{to{transform:rotate(-360deg);}}
+.orb-core{
+  width:22%;height:22%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #6f8bff, var(--blue) 60%, var(--purple) 100%);
+  box-shadow:0 0 60px rgba(45,79,198,0.6), 0 0 120px rgba(69,24,197,0.35);
+  animation:pulse 3.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+
+/* ===== Sections generic ===== */
+section{position:relative;padding:var(--section-pad) 0;}
+.section-header{max-width:640px;margin-bottom:4rem;}
+.section-header h2{font-size:clamp(2rem,4.4vw,3.4rem);margin-bottom:1.2rem;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);}
+
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.8s var(--ease), transform 0.8s var(--ease);}
+.reveal.in{opacity:1;transform:translateY(0);}
+.reveal-left{opacity:0;transform:translateX(-32px);transition:opacity 0.8s var(--ease), transform 0.8s var(--ease);}
+.reveal-left.in{opacity:1;transform:translateX(0);}
+.reveal-right{opacity:0;transform:translateX(32px);transition:opacity 0.8s var(--ease), transform 0.8s var(--ease);}
+.reveal-right.in{opacity:1;transform:translateX(0);}
+
+/* ===== About ===== */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.about-visual{position:relative;aspect-ratio:4/3;border:1px solid var(--border);border-radius:4px;
+  background:linear-gradient(135deg,#0f1220,#141428 45%,#0a0d18);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;}
+.about-visual::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 30% 30%, rgba(45,79,198,0.25), transparent 60%);
+  animation:drift 22s ease-in-out infinite;
+  pointer-events:none;
+}
+.about-visual img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;}
+@keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(6%,-4%);}}
+.about-badge{
+  position:absolute;bottom:-1.4rem;right:-1.2rem;z-index:2;
+  background:var(--blue);color:#fff;padding:1.4rem 1.7rem;border-radius:4px;
+  text-align:center;box-shadow:0 20px 50px rgba(45,79,198,0.35);
+}
+.about-badge .num{font-family:'Anton',sans-serif;font-size:2.2rem;}
+.about-badge .lbl{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;margin-top:0.2rem;}
+.about-text h2{font-size:clamp(1.9rem,3.6vw,2.8rem);margin-bottom:1.4rem;}
+.about-text p{margin-bottom:1.1rem;}
+.pull-quote{
+  border-left:2px solid var(--blue);padding-left:1.2rem;margin-top:1.6rem;
+  font-style:italic;color:var(--blue);font-size:1.05rem;
+}
+
+/* ===== Services ===== */
+.service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem;}
+.card{
+  border:1px solid var(--border);border-radius:4px;padding:2.2rem;
+  background:rgba(255,255,255,0.015);
+  transition:transform 0.35s var(--ease), border-color 0.35s var(--ease), background 0.35s var(--ease);
+}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.03);}
+.icon-box{
+  width:46px;height:46px;border-radius:8px;background:rgba(45,79,198,0.14);
+  display:flex;align-items:center;justify-content:center;margin-bottom:1.4rem;
+  border:1px solid rgba(45,79,198,0.3);
+}
+.card h3{font-size:1.15rem;text-transform:none;letter-spacing:0;font-family:'Inter',sans-serif;font-weight:700;margin-bottom:0.7rem;}
+.card p{font-size:0.9rem;margin-bottom:1.2rem;}
+.learn-link{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue);display:inline-flex;gap:0.4rem;align-items:center;}
+.learn-link svg{transition:transform 0.25s var(--ease);}
+.card:hover .learn-link svg{transform:translateX(4px);}
+
+/* ===== Work gallery ===== */
+.work-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.6rem;
+  align-items:stretch;
+}
+.tile{
+  position:relative;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+  display:flex;
+  flex-direction:column;
+  transition:transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+.tile:hover{
+  transform:translateY(-6px);
+  border-color:rgba(45,79,198,0.45);
+  box-shadow:0 18px 45px rgba(0,0,0,0.6), 0 0 30px rgba(45,79,198,0.15);
+}
+.tile-media{
+  position:relative;
+  width:100%;
+  aspect-ratio:9/16;
+  background:#07080e;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid var(--border-faint);
+}
+.tile-img-link{
+  display:flex;
+  width:100%;
+  height:100%;
+  align-items:center;
+  justify-content:center;
+  cursor:zoom-in;
+  position:relative;
+  background:radial-gradient(circle at center, #111528 0%, #06070d 100%);
+}
+.tile-img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+  transition:transform 0.45s var(--ease);
+}
+.tile-img-link:hover .tile-img{
+  transform:scale(1.02);
+}
+.tile-zoom-badge{
+  position:absolute;
+  top:12px;
+  right:12px;
+  padding:0.35rem 0.65rem;
+  border-radius:100px;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(6px);
+  border:1px solid var(--border);
+  font-size:0.62rem;
+  color:#fff;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+  pointer-events:none;
+  opacity:0.85;
+  transition:opacity 0.25s var(--ease);
+}
+.tile:hover .tile-zoom-badge{
+  opacity:1;
+}
+.tile-video-wrap{
+  position:relative;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.tile-video-wrap iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+  aspect-ratio:9/16;
+}
+.tile-content{
+  padding:1.4rem 1.4rem 1.6rem;
+  background:rgba(8,9,14,0.92);
+  display:flex;
+  flex-direction:column;
+  flex-grow:1;
+}
+.tile-tag{
+  font-size:0.64rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--lime);
+  margin-bottom:0.4rem;
+  display:block;
+  font-weight:600;
+}
+.tile h4{
+  font-family:'Inter',sans-serif;
+  font-weight:700;
+  text-transform:none;
+  letter-spacing:0;
+  font-size:1.1rem;
+  margin-bottom:0.4rem;
+  color:#fff;
+}
+.tile p{
+  font-size:0.84rem;
+  margin:0;
+  color:#b0b0b0;
+  line-height:1.5;
+}
+.view-more{text-align:center;margin-top:2.8rem;}
+
+/* Lightbox modal for full uncropped image inspection */
+.lightbox-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.92);
+  backdrop-filter:blur(10px);
+  z-index:99999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+  cursor:zoom-out;
+}
+.lightbox-modal.active{
+  display:flex;
+  animation:lbFade 0.25s ease-out;
+}
+@keyframes lbFade{from{opacity:0;}to{opacity:1;}}
+.lightbox-content{
+  position:relative;
+  max-width:92vw;
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:default;
+}
+.lightbox-content img{
+  max-width:100%;
+  max-height:82vh;
+  object-fit:contain;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,0.15);
+  box-shadow:0 25px 80px rgba(0,0,0,0.8), 0 0 50px rgba(45,79,198,0.25);
+}
+.lightbox-caption{
+  margin-top:0.9rem;
+  color:#eee;
+  font-size:0.92rem;
+  text-align:center;
+}
+.lightbox-close{
+  position:absolute;
+  top:-42px;
+  right:0;
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:1.8rem;
+  cursor:pointer;
+  line-height:1;
+  padding:4px 8px;
+  transition:color 0.2s ease, transform 0.2s ease;
+}
+.lightbox-close:hover{
+  color:var(--lime);
+  transform:scale(1.15);
+}
+
+/* ===== Process ===== */
+.process-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;}
+.process-step .num{font-family:'Anton',sans-serif;font-size:3rem;color:rgba(45,79,198,0.35);line-height:1;margin-bottom:0.8rem;}
+.process-step h3{font-size:1.05rem;font-family:'Inter',sans-serif;font-weight:700;text-transform:none;letter-spacing:0;margin-bottom:0.5rem;}
+.process-step p{font-size:0.88rem;}
+
+/* ===== Why ===== */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.why-list{margin-top:1.6rem;display:flex;flex-direction:column;gap:1.4rem;}
+.why-item{display:flex;gap:1rem;}
+.check{
+  width:26px;height:26px;border-radius:50%;background:rgba(175,255,0,0.12);border:1px solid rgba(175,255,0,0.4);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+}
+.why-item h4{font-family:'Inter',sans-serif;font-weight:700;font-size:0.98rem;margin-bottom:0.25rem;}
+.why-item p{font-size:0.88rem;}
+.quote-card{
+  border:1px solid var(--border);border-radius:6px;padding:2.6rem;position:relative;overflow:hidden;
+  background:rgba(255,255,255,0.02);
+}
+.quote-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--purple),var(--lime));
+  background-size:200% 100%;animation:shimmer 5s linear infinite;
+}
+@keyframes shimmer{to{background-position:200% 0;}}
+.quote-card blockquote{font-family:'Anton',sans-serif;text-transform:none;letter-spacing:-0.01em;
+  font-style:italic;font-size:1.4rem;line-height:1.25;color:#eee;margin-bottom:1.4rem;}
+.quote-card cite{font-size:0.82rem;color:var(--fg-muted);font-style:normal;}
+
+/* ===== AI Agents ===== */
+.ai-section{background:linear-gradient(180deg, rgba(45,79,198,0.05), transparent 60%);border-top:1px solid var(--border-faint);border-bottom:1px solid var(--border-faint);}
+.ai-grid{display:grid;grid-template-columns:0.9fr 1.1fr;gap:3.5rem;align-items:center;}
+.ai-visual{position:relative;height:400px;display:flex;align-items:center;justify-content:center;}
+.ai-badge{
+  position:absolute;font-size:0.68rem;padding:0.55rem 0.9rem;border:1px solid var(--border);
+  border-radius:100px;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);
+  animation:float 5s ease-in-out infinite;
+}
+.ai-badge.b1{top:6%;left:2%;animation-delay:0s;}
+.ai-badge.b2{bottom:14%;left:-2%;animation-delay:1.2s;}
+.ai-badge.b3{top:44%;right:0;animation-delay:2.2s;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;margin:2rem 0 2.2rem;}
+.feature-item{display:flex;gap:0.8rem;}
+.feature-item .icon-box{width:36px;height:36px;margin-bottom:0;flex-shrink:0;}
+.feature-item h4{font-family:'Inter',sans-serif;font-weight:700;font-size:0.9rem;margin-bottom:0.2rem;}
+.feature-item p{font-size:0.82rem;}
+
+/* ===== Testimonials ===== */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.4rem;}
+.stars{display:flex;gap:3px;margin-bottom:1rem;color:var(--gold);}
+.testi-card p.quote{font-style:italic;color:#ddd;margin-bottom:1.6rem;font-size:0.95rem;}
+.author{display:flex;align-items:center;gap:0.8rem;}
+.avatar{width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;}
+.author-name{font-size:0.88rem;font-weight:700;}
+.author-role{font-size:0.75rem;color:var(--fg-muted);}
+
+/* ===== FAQ ===== */
+.faq-list{max-width:700px;margin:0 auto;}
+.faq-item{border-bottom:1px solid var(--border-faint);}
+.faq-q{
+  width:100%;background:none;border:none;color:#fff;text-align:left;
+  padding:1.5rem 0;display:flex;justify-content:space-between;align-items:center;
+  font-size:1rem;font-weight:600;
+}
+.faq-icon{font-size:1.4rem;transition:transform 0.35s var(--ease);color:var(--blue);}
+.faq-item.open .faq-icon{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s var(--ease);}
+.faq-a p{padding-bottom:1.5rem;font-size:0.92rem;}
+
+/* ===== Contact ===== */
+.contact-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:4rem;}
+.contact-detail{display:flex;gap:1rem;margin-bottom:1.4rem;align-items:flex-start;}
+.contact-detail .icon-box{margin-bottom:0;flex-shrink:0;}
+.contact-detail strong{display:block;font-size:0.9rem;margin-bottom:0.2rem;}
+.contact-detail span{font-size:0.85rem;color:var(--fg-muted);}
+.social-row{display:flex;gap:0.8rem;margin-top:1.8rem;}
+.social-row a{
+  width:38px;height:38px;border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:0.8rem;
+  transition:transform 0.25s var(--ease), border-color 0.25s var(--ease), color 0.25s var(--ease);
+}
+.social-row a:hover{transform:translateY(-3px);border-color:var(--blue);color:var(--blue);}
+.form-card{border:1px solid var(--border);border-radius:6px;padding:2.4rem;background:rgba(255,255,255,0.015);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.field{margin-bottom:1.2rem;}
+.field label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-muted);margin-bottom:0.5rem;}
+.field input,.field select,.field textarea{
+  width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:3px;
+  padding:0.85rem 1rem;color:#fff;font-family:inherit;font-size:0.9rem;
+  transition:border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(45,79,198,0.2);
+}
+.field textarea{resize:vertical;min-height:100px;}
+.field select{padding:0.6rem 0.8rem;font-size:0.82rem;max-width:220px;}
+.submit-btn{
+  width:100%;border:none;
+  transition:transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+}
+@keyframes sendBtnPulse{
+  0%{transform:scale(1);box-shadow:0 0 0 0 rgba(175,255,0,0.8), 0 0 30px rgba(45,79,198,0.6);}
+  35%{transform:scale(1.03);box-shadow:0 0 0 10px rgba(175,255,0,0.35), 0 0 50px rgba(45,79,198,0.9);}
+  70%{transform:scale(1);box-shadow:0 0 0 18px rgba(175,255,0,0), 0 0 20px rgba(45,79,198,0.3);}
+  100%{transform:scale(1);box-shadow:0 0 0 0 transparent;}
+}
+.btn-highlight{
+  animation: sendBtnPulse 1.8s ease-out 1 !important;
+}
+.form-highlight{
+  border-color: rgba(175,255,0,0.7) !important;
+  box-shadow: 0 0 45px rgba(45,79,198,0.4), 0 0 20px rgba(175,255,0,0.25) !important;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.form-success{display:none;text-align:center;padding:2rem 0;}
+.form-success.show{display:block;}
+.form-card.submitted form{display:none;}
+
+/* ===== CTA banner ===== */
+.cta-banner{text-align:center;position:relative;}
+.cta-banner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 40%, rgba(45,79,198,0.18), transparent 60%);
+}
+.cta-banner h2{font-size:clamp(2rem,5vw,3.6rem);margin-bottom:1.2rem;position:relative;}
+.cta-banner p{margin:0 auto 2rem;position:relative;}
+.cta-banner .btn{position:relative;}
+
+/* ===== Footer ===== */
+footer{
+  background:radial-gradient(ellipse at 50% 0%, #0d0f1a 0%, #060608 55%, #000 100%);
+  padding:6rem 0 0;position:relative;overflow:hidden;isolation:isolate;
+}
+#footer-canvas{position:absolute;inset:0;z-index:0;opacity:0.55;pointer-events:none;}
+.footer-veil{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(45,79,198,0.10), transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(69,24,197,0.09), transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(175,255,0,0.04), transparent 50%);
+}
+.footer-fade-top{
+  position:absolute;top:0;left:0;right:0;height:140px;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg, #000 0%, transparent 100%);
+}
+.footer-orb{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:1;
+  border:1px solid rgba(255,255,255,0.06);
+}
+.footer-orb.o1{width:180px;height:180px;top:6%;left:6%;animation:footerFloat 12s ease-in-out infinite;}
+.footer-orb.o2{width:110px;height:110px;bottom:18%;right:10%;animation:footerFloat 9s ease-in-out infinite reverse;}
+.footer-orb.o3{width:60px;height:60px;top:38%;right:22%;border-color:rgba(175,255,0,0.12);animation:footerFloat 7s ease-in-out infinite;}
+@keyframes footerFloat{0%,100%{transform:translateY(0) scale(1);opacity:0.5;}50%{transform:translateY(-16px) scale(1.05);opacity:0.9;}}
+.footer-glow-line{
+  position:absolute;left:50%;top:0;width:1px;height:100%;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg, rgba(45,79,198,0.25), transparent 60%);
+  transform:translateX(-50%);
+  opacity:0.4;
+}
+.footer-accent-line{width:36px;height:2px;background:linear-gradient(90deg,var(--blue),var(--lime));margin-top:1.1rem;border-radius:2px;}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2.5rem;position:relative;z-index:2;}
+.footer-brand p{font-size:0.88rem;margin-top:1rem;max-width:280px;}
+.footer-col h5{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--fg-muted);margin-bottom:1.2rem;}
+.footer-col a{display:block;font-size:0.88rem;color:#ccc;margin-bottom:0.8rem;transition:color 0.25s var(--ease), transform 0.25s var(--ease), text-shadow 0.25s var(--ease);position:relative;width:fit-content;}
+.footer-col a:hover{color:var(--lime);transform:translateX(3px);text-shadow:0 0 14px rgba(175,255,0,0.35);}
+.footer-social{display:flex;gap:0.7rem;margin-top:0.2rem;margin-bottom:1.4rem;}
+.footer-social a{
+  width:36px;height:36px;border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:0.75rem;margin-bottom:0;
+  transition:transform 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), color 0.25s var(--ease);
+}
+.footer-social a:hover{transform:translateY(-3px);border-color:var(--blue);color:var(--blue);box-shadow:0 8px 22px rgba(45,79,198,0.25);}
+.footer-location{font-size:0.82rem;color:var(--fg-muted);display:flex;align-items:center;gap:0.5rem;margin-top:0.2rem;}
+.footer-bottom{
+  margin-top:4rem;padding:1.7rem 0;
+  border-top:1px solid transparent;
+  border-image:linear-gradient(90deg, transparent, rgba(255,255,255,0.14), transparent) 1;
+  display:flex;justify-content:space-between;font-size:0.78rem;color:var(--fg-muted);
+  position:relative;z-index:2;flex-wrap:wrap;gap:0.6rem;
+}
+.footer-bottom a{color:var(--fg-muted);margin-left:1.2rem;transition:color 0.25s var(--ease);}
+.footer-bottom a:hover{color:#fff;}
+
+/* ===== Responsive ===== */
+@media (max-width:1024px){
+  .hero .wrap{grid-template-columns:1fr;}
+  .hero-visual{display:none;}
+  .about-grid,.why-grid,.ai-grid,.contact-grid{grid-template-columns:1fr;}
+  .work-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:768px){
+  .nav-links,.nav-cta{display:none;}
+  .burger{display:flex;}
+  .work-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:2rem;}
+  section{padding-left:0;padding-right:0;}
+}
+@media (max-width:480px){
+  .stats-row{flex-wrap:wrap;gap:1rem;}
+  .stat{border-right:none;flex:0 0 45%;}
+  .footer-grid{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;}
+}
+</style>
+</head>
+<body>
+
+<div id="preloader"><div class="ring"></div></div>
+<div id="grain"></div>
+
+<nav id="navbar">
+  <div class="wrap nav-inner">
+    <a href="#" class="logo"><span class="logo-mark">E</span>Emmason</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#submitBtn" class="nav-cta">Book a Call</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-backdrop" id="mobileBackdrop"></div>
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#work">Work</a>
+  <a href="#process">Process</a>
+  <a href="#submitBtn">Contact</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner wrap">
+    <div>
+      <div class="badge">Now accepting new clients for Q4 2026</div>
+      <h1>Your Business Is Leaving <span class="accent">Money on the Table.</span> We Build the Systems That Capture It.</h1>
+      <p class="lead">Emmason Designs builds websites, funnels, ad campaigns and AI agents engineered around one outcome: turning attention into paying customers.</p>
+      <div class="cta-row">
+        <a href="tel:+2349061626157" class="btn btn-primary">Book a Call</a>
+        <a href="https://wa.me/2349069678728" target="_blank" rel="noopener" class="btn btn-ghost">Chat Us on WhatsApp</a>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-num" data-count="50">0</div><div class="stat-label">Projects Delivered</div></div>
+        <div class="stat"><div class="stat-num" data-count="35">0</div><div class="stat-label">Happy Clients</div></div>
+        <div class="stat"><div class="stat-num" data-count="12">0</div><div class="stat-label">AI Systems Deployed</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="ring ring1"></div>
+      <div class="ring ring2"></div>
+      <div class="ring ring3"></div>
+      <div class="orb-core"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap about-grid">
+    <div class="about-visual reveal-left">
+      <img src="/src/assets/images/emmason_agency_logo_1790750327237.jpg" alt="Emmason Agency">
+      <div class="about-badge"><div class="num">3+</div><div class="lbl">Years of Excellence</div></div>
+    </div>
+    <div class="about-text reveal-right">
+      <div class="eyebrow">Who we are</div>
+      <h2>A Creative Technology Agency Built for the Modern Business</h2>
+      <p>Emmason Designs was founded on a simple idea: great design only matters if it moves a business forward. Over 3 years, that idea grew from freelance design work into a full studio spanning brand identity, web development, paid media and AI automation.</p>
+      <p>We work with founders who are tired of pretty deliverables that don't convert. Every project we ship is built to be measured — in leads, in bookings, in hours saved.</p>
+      <div class="pull-quote">"Design without a business outcome is just decoration."</div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider"></div></div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow">What we do</div>
+      <h2>Services Built to Compound</h2>
+      <p>Six disciplines, one team — so your brand, your site and your growth systems all pull in the same direction.</p>
+    </div>
+    <div class="service-grid">
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg></div>
+        <h3>Web Development</h3>
+        <p>Fast, conversion-focused websites and web apps built to represent your brand at its best.</p>
+        <a href="#submitBtn" class="learn-link" data-service="Web Development">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+        <h3>Landing Pages &amp; Sales Funnels</h3>
+        <p>High-converting single pages built to move visitors from curious to committed.</p>
+        <a href="#submitBtn" class="learn-link" data-service="Landing Pages & Funnels">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 3h-6M21 3v6"/></svg></div>
+        <h3>Facebook, Instagram &amp; TikTok Ads</h3>
+        <p>Full-funnel paid media — creative, targeting and optimization managed end to end.</p>
+        <a href="#submitBtn" class="learn-link" data-service="Paid Ads">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div>
+        <h3>Graphic &amp; Brand Design</h3>
+        <p>Logos, identity systems and visual language that make a brand instantly recognizable.</p>
+        <a href="#submitBtn" class="learn-link" data-service="Brand Design">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M12 2a5 5 0 015 5c0 1.5-.7 2.3-1.5 3.2A4 4 0 0014 13v1H10v-1a4 4 0 00-1.5-2.8C7.7 9.3 7 8.5 7 7a5 5 0 015-5z"/><path d="M9 18h6M10 21h4"/></svg></div>
+        <h3>AI Agents &amp; Business Automation</h3>
+        <p>Custom AI agents that handle enquiries, bookings and follow-ups around the clock.</p>
+        <a href="#submitBtn" class="learn-link" data-service="AI Automation">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="card reveal">
+        <div class="icon-box"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M3 17l5-5 4 4 9-9"/></svg></div>
+        <h3>Digital Strategy &amp; Consulting</h3>
+        <p>A clear, prioritized roadmap for growth — built around your resources, not a template.</p>
+        <a href="#submitBtn" class="learn-link" data-service="Other">Learn more <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow">Selected work</div>
+      <h2>Proof, Not Promises</h2>
+      <p>A sample of the systems we've shipped — and the numbers they've moved.</p>
+    </div>
+    <div class="work-grid">
+      <div class="tile reveal">
+        <div class="tile-media">
+          <a href="https://raw.githubusercontent.com/mirabelfelix98/My-workflow/main/Screenshot_20260929_010907_Chrome.jpg" class="tile-img-link" title="Click to view full image">
+            <img src="https://raw.githubusercontent.com/mirabelfelix98/My-workflow/main/Screenshot_20260929_010907_Chrome.jpg" alt="02Best Solar Redesign - Full Platform Dashboard" class="tile-img" loading="lazy">
+            <span class="tile-zoom-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg> Full View</span>
+          </a>
+        </div>
+        <div class="tile-content">
+          <span class="tile-tag">Web Development</span>
+          <h4>02Best Solar Redesign</h4>
+          <p>Full rebuild of a lending platform's client dashboard.</p>
+        </div>
+      </div>
+      <div class="tile reveal">
+        <div class="tile-media">
+          <a href="https://raw.githubusercontent.com/mirabelfelix98/My-workflow/main/Screenshot_20260929_012949_Meta%20Ads.jpg" class="tile-img-link" title="Click to view full image">
+            <img src="https://raw.githubusercontent.com/mirabelfelix98/My-workflow/main/Screenshot_20260929_012949_Meta%20Ads.jpg" alt="Victor's WAEC and NECO Class - Meta Ads Campaign System" class="tile-img" loading="lazy">
+            <span class="tile-zoom-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg> Full View</span>
+          </a>
+        </div>
+        <div class="tile-content">
+          <span class="tile-tag">Paid Advertising · 3.2x ROAS</span>
+          <h4>Victor's WAEC and NECO Class</h4>
+          <p>TikTok &amp; Instagram campaign system.</p>
+        </div>
+      </div>
+      <div class="tile reveal">
+        <div class="tile-media">
+          <div class="tile-video-wrap">
+            <iframe src="https://www.youtube.com/embed/U1RqT_i9YMk?autoplay=1&mute=1&loop=1&playlist=U1RqT_i9YMk&controls=1&modestbranding=1&playsinline=1&rel=0" title="Real Estate AI Agent demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="tile-content">
+          <span class="tile-tag">AI Automation · 200+/wk</span>
+          <h4>Real Estate AI Agent</h4>
+          <p>24/7 enquiry handling and booking system.</p>
+        </div>
+      </div>
+      <div class="tile reveal">
+        <div class="tile-media">
+          <div class="tile-video-wrap">
+            <iframe src="https://www.youtube.com/embed/bub9z-NTX1o?autoplay=1&mute=1&loop=1&playlist=bub9z-NTX1o&controls=1&modestbranding=1&playsinline=1&rel=0" title="SaaS Product Launch Funnel demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="tile-content">
+          <span class="tile-tag">Funnel · 2,500+ Sign-ups</span>
+          <h4>SaaS Product Launch Funnel</h4>
+          <p>Landing page and email sequence for launch week.</p>
+        </div>
+      </div>
+      <div class="tile reveal">
+        <div class="tile-media">
+          <div class="tile-video-wrap">
+            <iframe src="https://www.youtube.com/embed/g9EqeMwl0rA?autoplay=1&mute=1&loop=1&playlist=g9EqeMwl0rA&controls=1&modestbranding=1&playsinline=1&rel=0" title="Emmason Designs demo" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+          </div>
+        </div>
+        <div class="tile-content">
+          <span class="tile-tag">AI + Web · 15+ hrs/wk saved</span>
+          <h4>Emmason Designs</h4>
+          <p>Order handling and support automated end to end.</p>
+        </div>
+      </div>
+    </div>
+    <div class="view-more reveal"><a href="#submitBtn" class="btn btn-ghost">View More Work</a></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow">How we work</div>
+      <h2>A Process Built for Momentum</h2>
+    </div>
+    <div class="process-grid">
+      <div class="process-step reveal"><div class="num">01</div><h3>Discover &amp; Understand</h3><p>We map your business, audience and goals before touching design.</p></div>
+      <div class="process-step reveal"><div class="num">02</div><h3>Strategy &amp; Design</h3><p>A visual direction and structure built around your specific brief.</p></div>
+      <div class="process-step reveal"><div class="num">03</div><h3>Build &amp; Develop</h3><p>Clean, fast, production-ready builds — tested before they ship.</p></div>
+      <div class="process-step reveal"><div class="num">04</div><h3>Launch &amp; Optimize</h3><p>We track performance after launch and refine what the data shows.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section id="why">
+  <div class="wrap why-grid">
+    <div class="reveal-left">
+      <div class="eyebrow">Why Emmason</div>
+      <h2 style="font-size:clamp(1.9rem,3.6vw,2.8rem);">Built Different. Built for Results.</h2>
+      <p style="margin-top:1rem;">We're not the cheapest agency, and we're not the biggest. We're the team that treats your growth like our own.</p>
+      <div class="why-list">
+        <div class="why-item"><div class="check">✓</div><div><h4>Premium Quality, Every Time</h4><p>No cut corners, no template shortcuts — every deliverable is built to last.</p></div></div>
+        <div class="why-item"><div class="check">✓</div><div><h4>Results-Focused, Not Just Pretty</h4><p>Every design decision is judged against one question: does it convert?</p></div></div>
+        <div class="why-item"><div class="check">✓</div><div><h4>Full Service, One Team</h4><p>Design, dev, ads and automation under one roof — no handoff chaos.</p></div></div>
+        <div class="why-item"><div class="check">✓</div><div><h4>Transparent &amp; Direct</h4><p>You always know what's being built, why, and what it's expected to do.</p></div></div>
+        <div class="why-item"><div class="check">✓</div><div><h4>AI-Ready for the Future</h4><p>We build automation into your business, not just a website that sits still.</p></div></div>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="quote-card">
+        <blockquote>"The best digital work sits at the intersection of great design, smart technology, and real business strategy. That's what we deliver — every single time."</blockquote>
+        <cite>— Emmanuel Chukwuka, Founder</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI AGENTS -->
+<section id="ai-agents" class="ai-section">
+  <div class="wrap ai-grid">
+    <div class="ai-visual reveal-left">
+      <div class="ring ring1" style="width:70%;height:70%;"></div>
+      <div class="ring ring2" style="width:48%;height:48%;"></div>
+      <div class="orb-core" style="width:20%;height:20%;"></div>
+      <div class="ai-badge b1">24/7 Enquiry Handling</div>
+      <div class="ai-badge b2">Auto Appointment Booking</div>
+      <div class="ai-badge b3">Smart Follow-Ups</div>
+    </div>
+    <div class="reveal-right">
+      <div class="eyebrow">AI systems</div>
+      <h2 style="font-size:clamp(1.9rem,3.6vw,2.8rem);">Put Your Business on Autopilot</h2>
+      <p style="margin-top:1rem;">Our AI agents handle the repetitive work that eats your day — enquiries, bookings, follow-ups — so your team can focus on the parts of the business only a human can run.</p>
+      <p style="margin-top:0.8rem;">Every agent is built around your actual workflows and tools, not a generic chatbot template.</p>
+      <div class="feature-grid">
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><div><h4>Customer Enquiry Handling</h4><p>Answers questions, qualifies leads, routes issues.</p></div></div>
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><h4>Appointment Booking</h4><p>Automated booking, reminders and rescheduling.</p></div></div>
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></div><div><h4>Follow-Ups &amp; Lead Nurture</h4><p>Consistent, personalized follow-up sequences.</p></div></div>
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><h4>Support &amp; Ticket Triage</h4><p>Handles common questions, escalates when needed.</p></div></div>
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M3 3v18h18M7 15l4-4 4 4 5-6"/></svg></div><div><h4>Task Automation</h4><p>Data entry, reports and admin work, handled.</p></div></div>
+        <div class="feature-item"><div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/></svg></div><div><h4>Tool Integration</h4><p>Connects to your CRM, calendar and messaging apps.</p></div></div>
+      </div>
+      <a href="#submitBtn" class="btn btn-primary" data-service="AI Automation">Explore AI for Your Business →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="wrap">
+    <div class="section-header reveal">
+      <div class="eyebrow">Client feedback</div>
+      <h2>What Clients Say</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="card testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"They rebuilt our funnel in two weeks and our sign-up rate more than doubled. The AI follow-up system alone paid for the project."</p>
+        <div class="author"><div class="avatar">TO</div><div><div class="author-name">Tunde O.</div><div class="author-role">Founder, SaaS Startup</div></div></div>
+      </div>
+      <div class="card testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"Our real estate leads now get answered within seconds, day or night. It changed how many appointments we're able to book."</p>
+        <div class="author"><div class="avatar">AF</div><div><div class="author-name">Amara F.</div><div class="author-role">Managing Director, Realty Firm</div></div></div>
+      </div>
+      <div class="card testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="quote">"Emmason handled our brand, site and ad campaigns as one system instead of three disconnected vendors. Everything finally moves together."</p>
+        <div class="author"><div class="avatar">CK</div><div><div class="author-name">Chidi K.</div><div class="author-role">Owner, D2C Brand</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="section-header reveal" style="margin-left:auto;margin-right:auto;text-align:center;">
+      <div class="eyebrow" style="justify-content:center;">Questions</div>
+      <h2>Frequently Asked</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-q">What services does Emmason Designs offer?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Web development, landing pages and funnels, paid social advertising, brand and graphic design, AI agents and automation, and digital strategy consulting.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How long does a typical project take?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>A landing page usually ships in 1-2 weeks. Full websites and AI agent builds run 3-6 weeks depending on scope.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Do you work with businesses outside Nigeria?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Yes — we work with clients across Africa, Europe and North America, all coordinated remotely.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">What makes your AI agents different from a chatbot?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Our agents are built around your real workflows and tools — CRM, calendar, WhatsApp — rather than a generic scripted chatbot.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How much does a project cost?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Every project is scoped individually based on complexity. Book a call and we'll give you a clear quote before any work begins.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Can you manage our ad campaigns ongoing, not just build them?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Yes — most clients keep us on a monthly retainer for ongoing ad management, reporting and optimization.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Do you offer support after launch?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Every project includes a post-launch support window, with ongoing maintenance plans available after that.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">How do we get started?<span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Book a free strategy call using the form below. We'll walk through your goals and recommend the right next step.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div class="reveal-left">
+      <div class="eyebrow">Get in touch</div>
+      <h2 style="font-size:clamp(1.8rem,3.4vw,2.6rem);">Let's Build Something That Works</h2>
+      <p style="margin-top:0.8rem;margin-bottom:2rem;">Tell us about your project and we'll get back to you within one business day.</p>
+      <div class="contact-detail">
+        <div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg></div>
+        <div><strong>Email</strong><span>chukwukae44@gmail.com</span></div>
+      </div>
+      <div class="contact-detail">
+        <div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><path d="M12 21s-7-6.5-7-11a7 7 0 0114 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+        <div><strong>Location</strong><span>Lagos, Nigeria</span></div>
+      </div>
+      <div class="contact-detail">
+        <div class="icon-box"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2d4fc6" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <div><strong>Response Time</strong><span>Within 24 hours, Mon–Sat</span></div>
+      </div>
+      <div class="social-row">
+        <a href="https://www.linkedin.com/in/emmanuel-chukwuka-4192a0375?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+        <a href="https://x.com/EmmanuelCh97629" target="_blank" rel="noopener" aria-label="X / Twitter">X</a>
+        <a href="https://www.instagram.com/emmason_designs" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+      </div>
+    </div>
+    <div class="reveal-right">
+      <div class="form-card" id="formCard">
+        <form id="contactForm">
+          <div class="form-row">
+            <div class="field"><label>First Name</label><input type="text" id="cfFirstName" required></div>
+            <div class="field"><label>Last Name</label><input type="text" id="cfLastName" required></div>
+          </div>
+          <div class="field"><label>Email</label><input type="email" id="cfEmail" required></div>
+          <div class="field">
+            <label>Service Interested In</label>
+            <select id="cfService" required>
+              <option value="">Select a service</option>
+              <option>Web Development</option>
+              <option>Landing Pages &amp; Funnels</option>
+              <option>Paid Ads</option>
+              <option>Brand Design</option>
+              <option>AI Automation</option>
+              <option>Multiple Services</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Estimated Budget</label>
+            <select id="cfBudget" required>
+              <option value="">Select a range</option>
+              <option>₦200,000 – ₦500,000</option>
+              <option>₦500,000 – ₦1,500,000</option>
+              <option>₦1,500,000 – ₦5,000,000</option>
+              <option>₦5,000,000+</option>
+              <option>Not Decided</option>
+            </select>
+          </div>
+          <div class="field"><label>Project Details</label><textarea id="cfDetails" required placeholder="Tell us a bit about what you're building..."></textarea></div>
+          <button type="submit" class="btn btn-primary submit-btn" id="submitBtn">Send Message</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <h3 style="font-size:1.4rem;margin-bottom:0.6rem;">Redirecting to WhatsApp</h3>
+          <p>Your details are pre-filled — just hit send in WhatsApp and we'll get back to you within one business day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="wrap reveal">
+    <h2>Ready to Build Something<br>That Actually Works?</h2>
+    <p>Book a free strategy call and let's map out what your next system should look like.</p>
+    <a href="#submitBtn" class="btn btn-primary">Book a Call →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+  <canvas id="footer-canvas"></canvas>
+  <div class="footer-veil"></div>
+  <div class="footer-fade-top"></div>
+  <div class="footer-glow-line"></div>
+  <div class="footer-orb o1"></div>
+  <div class="footer-orb o2"></div>
+  <div class="footer-orb o3"></div>
+
+  <div class="wrap footer-grid">
+    <div class="footer-brand reveal">
+      <a href="#" class="logo"><span class="logo-mark">E</span>Emmason</a>
+      <p>A Lagos-based creative technology agency building websites, funnels, ad systems and AI agents for growing businesses.</p>
+      <div class="footer-accent-line"></div>
+    </div>
+    <div class="footer-col reveal">
+      <h5>What We Do</h5>
+      <a href="#services">Web Development</a>
+      <a href="#services">Landing Pages</a>
+      <a href="#services">Paid Advertising</a>
+      <a href="#services">Brand Design</a>
+      <a href="#services">AI Agents &amp; Automation</a>
+    </div>
+    <div class="footer-col reveal">
+      <h5>Company</h5>
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#submitBtn">Contact</a>
+    </div>
+    <div class="footer-col reveal">
+      <h5>Connect With Us</h5>
+      <div class="footer-social">
+        <a href="https://www.linkedin.com/in/emmanuel-chukwuka-4192a0375?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+        <a href="https://x.com/EmmanuelCh97629" target="_blank" rel="noopener" aria-label="X / Twitter">X</a>
+        <a href="https://www.instagram.com/emmason_designs" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
+      </div>
+      <a href="mailto:chukwukae44@gmail.com">chukwukae44@gmail.com</a>
+      <span class="footer-location">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><path d="M12 21s-7-6.5-7-11a7 7 0 0114 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Lagos, Nigeria
+      </span>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Emmason Designs. All rights reserved.</span>
+    <span><a href="#">Privacy</a><a href="#">Terms</a></span>
+  </div>
+</footer>
+
+<script>
+/* ---------- Preloader ---------- */
+window.addEventListener('load', () => {
+  const pl = document.getElementById('preloader');
+  setTimeout(() => pl.classList.add('hidden'), 300);
+});
+
+/* ---------- Lenis smooth scroll ---------- */
+let lenis;
+try {
+  lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 3) });
+  function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+} catch(e){ /* fallback: native scroll */ }
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    const id = a.getAttribute('href');
+    if(id.length>1){
+      const target = document.querySelector(id);
+      if(target){
+        e.preventDefault();
+        
+        // If clicking a CTA leading to Send Message button / contact form
+        const isLeadingToSend = (id === '#submitBtn' || id === '#contact' || id === '#contactForm');
+        
+        // Auto-select requested service if specified (e.g. from Services section)
+        if(a.dataset.service){
+          const serviceSelect = document.getElementById('cfService');
+          if(serviceSelect){
+            for(let i=0; i<serviceSelect.options.length; i++){
+              if(serviceSelect.options[i].text.toLowerCase().includes(a.dataset.service.toLowerCase()) ||
+                 a.dataset.service.toLowerCase().includes(serviceSelect.options[i].text.toLowerCase())){
+                serviceSelect.selectedIndex = i;
+                break;
+              }
+            }
+          }
+        }
+
+        // Determine destination element and offset
+        const scrollDest = (isLeadingToSend && document.getElementById('formCard')) 
+          ? document.getElementById('formCard') 
+          : target;
+        const offset = isLeadingToSend ? -100 : -60;
+
+        if(lenis) lenis.scrollTo(scrollDest, {offset: offset});
+        else scrollDest.scrollIntoView({behavior:'smooth', block:'center'});
+
+        // Close mobile overlay if open and reset hamburger icon
+        if(typeof closeMobileMenu === 'function') closeMobileMenu();
+        else {
+          const overlay = document.getElementById('mobileOverlay');
+          const mb = document.getElementById('mobileBackdrop');
+          const burger = document.getElementById('burger');
+          if(overlay) overlay.classList.remove('open');
+          if(mb) mb.classList.remove('open');
+          if(burger) burger.classList.remove('open');
+        }
+
+        // Highlight the Send Message call to action button & form card
+        if(isLeadingToSend){
+          const submitBtn = document.getElementById('submitBtn');
+          const formCard = document.getElementById('formCard');
+          if(submitBtn){
+            submitBtn.classList.remove('btn-highlight');
+            void submitBtn.offsetWidth;
+            submitBtn.classList.add('btn-highlight');
+          }
+          if(formCard){
+            formCard.classList.remove('form-highlight');
+            void formCard.offsetWidth;
+            formCard.classList.add('form-highlight');
+          }
+          setTimeout(()=>{
+            const firstField = document.getElementById('cfFirstName');
+            if(firstField && document.activeElement !== firstField){
+              firstField.focus({preventScroll:true});
+            }
+          }, 850);
+          setTimeout(()=>{
+            if(formCard) formCard.classList.remove('form-highlight');
+            if(submitBtn) submitBtn.classList.remove('btn-highlight');
+          }, 2400);
+        }
+      }
+    }
+  });
+});
+
+/* ---------- Navbar scroll state ---------- */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', ()=>{
+  navbar.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ---------- Mobile menu ---------- */
+const burger = document.getElementById('burger');
+const overlay = document.getElementById('mobileOverlay');
+const mobileBackdrop = document.getElementById('mobileBackdrop');
+
+function toggleMobileMenu(){
+  const isOpen = overlay && overlay.classList.contains('open');
+  if(isOpen){
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
+function openMobileMenu(){
+  if(overlay) overlay.classList.add('open');
+  if(mobileBackdrop) mobileBackdrop.classList.add('open');
+  if(burger){
+    burger.classList.add('open');
+    burger.setAttribute('aria-expanded', 'true');
+    burger.setAttribute('aria-label', 'Close menu');
+  }
+}
+
+function closeMobileMenu(){
+  if(overlay) overlay.classList.remove('open');
+  if(mobileBackdrop) mobileBackdrop.classList.remove('open');
+  if(burger){
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', 'Open menu');
+  }
+}
+
+if(burger) burger.addEventListener('click', toggleMobileMenu);
+if(mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobileMenu);
+
+/* ---------- Scroll reveal ---------- */
+const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach((entry, i)=>{
+    if(entry.isIntersecting){
+      setTimeout(()=> entry.target.classList.add('in'), (i%6)*70);
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold:0.15 });
+revealEls.forEach(el=> io.observe(el));
+
+/* ---------- Count-up stats ---------- */
+const statEls = document.querySelectorAll('.stat-num');
+const statIO = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      const start = performance.now();
+      const dur = 1400;
+      function tick(now){
+        const p = Math.min((now-start)/dur, 1);
+        const eased = 1 - Math.pow(1-p, 3);
+        el.textContent = Math.floor(eased * target) + (p>=1 ? '+' : '');
+        if(p<1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      statIO.unobserve(el);
+    }
+  });
+}, {threshold:0.5});
+statEls.forEach(el=> statIO.observe(el));
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll('.faq-item').forEach(item=>{
+  const q = item.querySelector('.faq-q');
+  const a = item.querySelector('.faq-a');
+  q.addEventListener('click', ()=>{
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(other=>{
+      if(other!==item){ other.classList.remove('open'); other.querySelector('.faq-a').style.maxHeight = null; }
+    });
+    item.classList.toggle('open');
+    a.style.maxHeight = isOpen ? null : a.scrollHeight + 'px';
+  });
+});
+
+/* ---------- Contact form — sends the filled details straight to WhatsApp ---------- */
+const form = document.getElementById('contactForm');
+const formCard = document.getElementById('formCard');
+const submitBtn = document.getElementById('submitBtn');
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  if(submitBtn.disabled) return;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Opening WhatsApp...';
+
+  const firstName = document.getElementById('cfFirstName').value.trim();
+  const lastName  = document.getElementById('cfLastName').value.trim();
+  const email     = document.getElementById('cfEmail').value.trim();
+  const service   = document.getElementById('cfService').value;
+  const budget    = document.getElementById('cfBudget').value;
+  const details   = document.getElementById('cfDetails').value.trim();
+
+  const message =
+`Hi Emmason, I'd like to get in touch.
+Name: ${firstName} ${lastName}
+Email: ${email}
+Service: ${service}
+Budget: ${budget}
+Project Details: ${details}`;
+
+  const waUrl = 'https://wa.me/2349069678728?text=' + encodeURIComponent(message);
+  window.open(waUrl, '_blank');
+
+  setTimeout(()=>{
+    formCard.classList.add('submitted');
+    document.getElementById('formSuccess').classList.add('show');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send Message';
+  }, 500);
+});
+
+/* ---------- Three.js hero scene ---------- */
+(function initHero3D(){
+  const canvas = document.getElementById('hero-canvas');
+  if(!canvas || typeof THREE === 'undefined') return;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0,0,7);
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if(renderer.outputEncoding !== undefined) renderer.outputEncoding = THREE.sRGBEncoding;
+  if(THREE.ACESFilmicToneMapping){ renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2; }
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0x222244, 0.5));
+  const key = new THREE.DirectionalLight(0x4488ff, 2.5); key.position.set(4,3,4); scene.add(key);
+  const fill = new THREE.DirectionalLight(0x8844ff, 1.2); fill.position.set(-4,1,2); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0x22cc88, 0.8); rim.position.set(0,-3,-2); scene.add(rim);
+  const point = new THREE.PointLight(0x2d4fc6, 1.5, 20); point.position.set(0,0,3); scene.add(point);
+
+  // TorusKnot centerpiece
+  const knotGeo = new THREE.TorusKnotGeometry(1.6, 0.45, 180, 24);
+  const knotMat = new THREE.MeshPhysicalMaterial({
+    color: 0x2d4fc6, metalness:0.7, roughness:0.15,
+    clearcoat:0.4, clearcoatRoughness:0.2,
+    emissive:0x0a1a4a, emissiveIntensity:0.15,
+    transparent:true, opacity:0.92
+  });
+  const knot = new THREE.Mesh(knotGeo, knotMat);
+  scene.add(knot);
+
+  // Orbital rings
+  const ringColors = [0x2d4fc6, 0x4518c5, 0xafff00];
+  const rings = [];
+  for(let i=0;i<3;i++){
+    const g = new THREE.TorusGeometry(2.4 + i*0.5, 0.01, 8, 100);
+    const m = new THREE.MeshBasicMaterial({color:ringColors[i], transparent:true, opacity:0.12});
+    const r = new THREE.Mesh(g,m);
+    r.rotation.x = Math.random()*Math.PI;
+    r.rotation.y = Math.random()*Math.PI;
+    r.userData.speed = 0.001 + i*0.0006;
+    scene.add(r);
+    rings.push(r);
+  }
+
+  // Particle field
+  const particleCount = 1100;
+  const positions = new Float32Array(particleCount*3);
+  const colors = new Float32Array(particleCount*3);
+  const c1 = new THREE.Color(0x2d4fc6), c2 = new THREE.Color(0x4518c5);
+  for(let i=0;i<particleCount;i++){
+    const r = 3.5 + Math.random()*3;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos((Math.random()*2)-1);
+    positions[i*3] = r*Math.sin(phi)*Math.cos(theta);
+    positions[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+    positions[i*3+2] = r*Math.cos(phi);
+    const c = c1.clone().lerp(c2, Math.random());
+    colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
+  }
+  const particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  particleGeo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+  const particleMat = new THREE.PointsMaterial({size:0.045, vertexColors:true, transparent:true, opacity:0.7, blending:THREE.AdditiveBlending, depthWrite:false});
+  const particles = new THREE.Points(particleGeo, particleMat);
+  scene.add(particles);
+
+  // Mouse tracking
+  let mouseX=0, mouseY=0, targetX=0, targetY=0;
+  window.addEventListener('mousemove', (e)=>{
+    mouseX = (e.clientX/window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY/window.innerHeight - 0.5) * 2;
+  });
+
+  window.addEventListener('resize', ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    knot.rotation.x = t*0.12;
+    knot.rotation.y = t*0.18;
+
+    targetX += (mouseX - targetX)*0.03;
+    targetY += (mouseY - targetY)*0.03;
+    knot.rotation.y += targetX*0.15;
+    knot.rotation.x += targetY*0.1;
+
+    rings.forEach((r,i)=>{ r.rotation.z += r.userData.speed; r.rotation.x += r.userData.speed*0.4; });
+    particles.rotation.y = t*0.02;
+
+    camera.position.x += (targetX*0.6 - camera.position.x)*0.03;
+    camera.position.y += (-targetY*0.4 - camera.position.y)*0.03;
+    camera.lookAt(0,0,0);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ---------- Three.js footer ambience (quiet, atmospheric) ---------- */
+(function initFooter3D(){
+  const canvas = document.getElementById('footer-canvas');
+  const footerEl = document.getElementById('site-footer');
+  if(!canvas || !footerEl || typeof THREE === 'undefined') return;
+
+  let running = false, raf = null;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, footerEl.clientWidth/footerEl.clientHeight, 0.1, 100);
+  camera.position.set(0,0,8);
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
+
+  function resize(){
+    const w = footerEl.clientWidth, h = footerEl.clientHeight;
+    renderer.setSize(w,h);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+
+  // Soft ambient light — no dramatic key light, this is background texture
+  scene.add(new THREE.AmbientLight(0x223355, 0.9));
+
+  // Slow-drifting particle field, sparse and dim
+  const count = 260;
+  const positions = new Float32Array(count*3);
+  const colors = new Float32Array(count*3);
+  const colA = new THREE.Color(0x2d4fc6), colB = new THREE.Color(0x4518c5), colC = new THREE.Color(0xafff00);
+  for(let i=0;i<count;i++){
+    positions[i*3]   = (Math.random()-0.5)*16;
+    positions[i*3+1] = (Math.random()-0.5)*9;
+    positions[i*3+2] = (Math.random()-0.5)*8;
+    const pick = Math.random();
+    const c = pick<0.45 ? colA : pick<0.85 ? colB : colC;
+    colors[i*3]=c.r; colors[i*3+1]=c.g; colors[i*3+2]=c.b;
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+  const mat = new THREE.PointsMaterial({size:0.05, vertexColors:true, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false});
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  // A couple of large, very soft glowing spheres drifting in the background
+  const blobGeo = new THREE.SphereGeometry(1.6, 24, 24);
+  const blobs = [];
+  const blobDefs = [
+    {color:0x2d4fc6, pos:[-3.5, 1.2, -3], scale:1.4, speed:0.06},
+    {color:0x4518c5, pos:[3.8, -0.8, -4], scale:1.1, speed:0.045},
+  ];
+  blobDefs.forEach(def=>{
+    const m = new THREE.MeshBasicMaterial({color:def.color, transparent:true, opacity:0.05});
+    const mesh = new THREE.Mesh(blobGeo, m);
+    mesh.position.set(...def.pos);
+    mesh.scale.setScalar(def.scale);
+    mesh.userData.speed = def.speed;
+    mesh.userData.baseY = def.pos[1];
+    scene.add(mesh);
+    blobs.push(mesh);
+  });
+
+  const clock2 = new THREE.Clock();
+  function tick(){
+    raf = requestAnimationFrame(tick);
+    const t = clock2.getElapsedTime();
+    points.rotation.y = t*0.008;
+    points.rotation.x = Math.sin(t*0.05)*0.02;
+    blobs.forEach(b=>{
+      b.position.y = b.userData.baseY + Math.sin(t*b.userData.speed*2)*0.6;
+      b.position.x += Math.sin(t*b.userData.speed) * 0.001;
+    });
+    renderer.render(scene, camera);
+  }
+
+  function start(){ if(!running){ running = true; tick(); } }
+  function stop(){ running = false; if(raf) cancelAnimationFrame(raf); }
+
+  // Only render while the footer is actually visible — keeps this "quiet" and cheap
+  const footerIO = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=> entry.isIntersecting ? start() : stop());
+  }, {threshold:0.05});
+  footerIO.observe(footerEl);
+
+  window.addEventListener('resize', resize);
+})();
+
+/* ---------- Lightbox for Work images ---------- */
+(function initLightbox(){
+  const lbModal = document.getElementById('lightboxModal');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCaption = document.getElementById('lightboxCaption');
+  const lbClose = document.getElementById('lightboxClose');
+
+  if (!lbModal || !lbImg || !lbClose) return;
+
+  document.querySelectorAll('.tile-img-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const img = link.querySelector('img');
+      if (img) {
+        lbImg.src = img.src;
+        lbImg.alt = img.alt || 'Work preview';
+        const card = link.closest('.tile');
+        const title = card ? card.querySelector('h4')?.textContent : '';
+        const tag = card ? card.querySelector('.tile-tag')?.textContent : '';
+        if (lbCaption) lbCaption.textContent = tag ? `${tag} — ${title}` : (title || '');
+        lbModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
+
+  function closeLb() {
+    lbModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  lbClose.addEventListener('click', closeLb);
+  lbModal.addEventListener('click', (e) => {
+    if (e.target === lbModal) closeLb();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lbModal.classList.contains('active')) closeLb();
+  });
+})();
+</script>
+
+<!-- Lightbox Modal -->
+<div id="lightboxModal" class="lightbox-modal" role="dialog" aria-modal="true" aria-label="Image preview">
+  <div class="lightbox-content">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close preview">✕</button>
+    <img id="lightboxImg" src="" alt="Full view preview">
+    <div id="lightboxCaption" class="lightbox-caption"></div>
+  </div>
+</div>
+</body>
+</html>
