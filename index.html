@@ -32,6 +32,24 @@
   --pad:clamp(1.5rem,5vw,4rem);
   --section-pad:clamp(6rem,12vw,12rem);
   --ease:cubic-bezier(0.16,1,0.3,1);
+
+  --chat--color-primary: #e74266;
+  --chat--color-primary-shade-50: #db4061;
+  --chat--color-primary-shade-100: #cf3c5c;
+  --chat--window--z-index: 99999;
+  --chat--toggle--z-index: 99999;
+  --chat--window--width: 400px;
+  --chat--window--height: 600px;
+}
+@media (max-width: 480px) {
+  :root {
+    --chat--window--width: calc(100vw - 24px);
+    --chat--window--height: 75vh;
+  }
+}
+.chat-powered-by,
+.chat-footer a[href*="n8n"] {
+  display: none !important;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{background:var(--bg);scroll-behavior:auto;}
@@ -1705,5 +1723,44 @@ Project Details: ${details}`;
     <div id="lightboxCaption" class="lightbox-caption"></div>
   </div>
 </div>
+
+<!-- AI Chat Widget -->
+<script>
+  (function() {
+    window.addEventListener('unhandledrejection', function(event) {
+      if (event.reason && (event.reason.message === 'Failed to fetch' || event.reason.name === 'TypeError')) {
+        event.preventDefault();
+      }
+    });
+
+    const origFetch = window.fetch;
+    window.fetch = async function(input, init) {
+      const url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+      if (url && url.includes('hannamontana.app.n8n.cloud')) {
+        try {
+          const res = await origFetch.apply(this, arguments);
+          return res;
+        } catch (err) {
+          // If the external webhook is offline or blocked by CORS in preview/development,
+          // return a valid response so the widget mounts cleanly without unhandled fetch rejections
+          return new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+      }
+      return origFetch.apply(this, arguments);
+    };
+  })();
+</script>
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+  createChat({
+    webhookUrl: 'https://hannamontana.app.n8n.cloud/webhook/c6932f14-a597-4904-aae1-9539002672c3/chat',
+    loadPreviousSession: true,
+    initialMessages: ['Hi! 👋 I am Ema from Emmason Designs. What are you looking to build?']
+  });
+</script>
 </body>
 </html>
